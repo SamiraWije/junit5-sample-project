@@ -1,6 +1,9 @@
 package com.programming.techie;
 
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -24,6 +27,10 @@ class ContactManagerTest {
         contactManager.addContact("Aston", "Brown", "0123456789");
         Assertions.assertFalse(contactManager.getAllContacts().isEmpty());
         Assertions.assertEquals(1,contactManager.getAllContacts().size());
+        Assertions.assertTrue(contactManager.getAllContacts().stream()
+                .anyMatch(contact -> contact.getFirstName().equals("Aston") &&
+                        contact.getLastName().equals("Brown") &&
+                        contact.getPhoneNumber().equals("0123456789")));
     }
 
     @Test
@@ -58,5 +65,31 @@ class ContactManagerTest {
     @AfterAll
     public void tearDownAll() {
         System.out.println("Should be executed at the end of the Test");
+    }
+
+    @Test
+    @DisplayName("Contact Should Be Created Only on MAC OS")
+    @EnabledOnOs(value = OS.MAC, disabledReason = "Enabled only on MAC OS")
+    public void shouldCreateContactOnlyMAC() {
+        contactManager.addContact("Aston", "Brown", "0123456789");
+        Assertions.assertFalse(contactManager.getAllContacts().isEmpty());
+        Assertions.assertEquals(1,contactManager.getAllContacts().size());
+        Assertions.assertTrue(contactManager.getAllContacts().stream()
+                .anyMatch(contact -> contact.getFirstName().equals("Aston") &&
+                        contact.getLastName().equals("Brown") &&
+                        contact.getPhoneNumber().equals("0123456789")));
+    }
+
+    @Test
+    @DisplayName("Contact Should Be Created Only on Linux OS")
+    @DisabledOnOs(value = OS.WINDOWS, disabledReason = "Disabled on Windows OS")
+    public void shouldNotCreateContactOnWindows() {
+        contactManager.addContact("Aston", "Brown", "0123456789");
+        Assertions.assertFalse(contactManager.getAllContacts().isEmpty());
+        Assertions.assertEquals(1,contactManager.getAllContacts().size());
+        Assertions.assertTrue(contactManager.getAllContacts().stream()
+                .anyMatch(contact -> contact.getFirstName().equals("Aston") &&
+                        contact.getLastName().equals("Brown") &&
+                        contact.getPhoneNumber().equals("0123456789")));
     }
 }
