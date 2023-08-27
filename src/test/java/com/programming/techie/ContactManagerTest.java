@@ -93,6 +93,7 @@ class ContactManagerTest {
                         contact.getPhoneNumber().equals("0123456789")));
     }
 
+    // assumeTrue() -> Run only if environment is DEV, if not abort and display message
     @Test
     @DisplayName("Test Contact Creation on Developer Machine")
     public void shouldTestContactCreationOnDEV() {
@@ -105,4 +106,19 @@ class ContactManagerTest {
                         contact.getLastName().equals("Brown") &&
                         contact.getPhoneNumber().equals("0123456789")));
     }
+
+    @DisplayName("Repeat Contact Creation Test 5 Times")
+    @RepeatedTest(value = 5,
+        name = "Repeating Contact Creation Test {currentRepetition} of {totalRepetitions}")
+    public void shouldTestContactCreationRepeatedly() {
+        Assumptions.assumeTrue("DEV".equals(System.getProperty("ENV")));
+        contactManager.addContact("Aston", "Brown", "0123456789");
+        Assertions.assertFalse(contactManager.getAllContacts().isEmpty());
+        Assertions.assertEquals(1,contactManager.getAllContacts().size());
+        Assertions.assertTrue(contactManager.getAllContacts().stream()
+                .anyMatch(contact -> contact.getFirstName().equals("Aston") &&
+                        contact.getLastName().equals("Brown") &&
+                        contact.getPhoneNumber().equals("0123456789")));
+    }
+
 }
