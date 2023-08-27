@@ -4,6 +4,8 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -113,6 +115,20 @@ class ContactManagerTest {
     public void shouldTestContactCreationRepeatedly() {
         Assumptions.assumeTrue("DEV".equals(System.getProperty("ENV")));
         contactManager.addContact("Aston", "Brown", "0123456789");
+        Assertions.assertFalse(contactManager.getAllContacts().isEmpty());
+        Assertions.assertEquals(1,contactManager.getAllContacts().size());
+        Assertions.assertTrue(contactManager.getAllContacts().stream()
+                .anyMatch(contact -> contact.getFirstName().equals("Aston") &&
+                        contact.getLastName().equals("Brown") &&
+                        contact.getPhoneNumber().equals("0123456789")));
+    }
+
+    @DisplayName("Parameterized Contact Creation Test")
+    @ParameterizedTest
+    @ValueSource(strings = {"0123456789", "0123456789", "0123456789"})
+    public void shouldTestContactCreationUsingValueSource(String phoneNumber) {
+        Assumptions.assumeTrue("DEV".equals(System.getProperty("ENV")));
+        contactManager.addContact("Aston", "Brown", phoneNumber);
         Assertions.assertFalse(contactManager.getAllContacts().isEmpty());
         Assertions.assertEquals(1,contactManager.getAllContacts().size());
         Assertions.assertTrue(contactManager.getAllContacts().stream()
