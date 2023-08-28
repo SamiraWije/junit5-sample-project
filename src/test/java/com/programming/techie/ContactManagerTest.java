@@ -5,7 +5,12 @@ import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
+
+import java.util.Arrays;
+import java.util.List;
 
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -127,7 +132,36 @@ class ContactManagerTest {
     @ParameterizedTest
     @ValueSource(strings = {"0123456789", "0123456789", "0123456789"})
     public void shouldTestContactCreationUsingValueSource(String phoneNumber) {
-        Assumptions.assumeTrue("DEV".equals(System.getProperty("ENV")));
+        contactManager.addContact("Aston", "Brown", phoneNumber);
+        Assertions.assertFalse(contactManager.getAllContacts().isEmpty());
+        Assertions.assertEquals(1,contactManager.getAllContacts().size());
+        Assertions.assertTrue(contactManager.getAllContacts().stream()
+                .anyMatch(contact -> contact.getFirstName().equals("Aston") &&
+                        contact.getLastName().equals("Brown") &&
+                        contact.getPhoneNumber().equals("0123456789")));
+    }
+
+    @DisplayName("Parameterized Contact Creation Test")
+    @ParameterizedTest
+    @MethodSource("phoneNumberList")
+    public void shouldTestPhoneNumberFormatUsingMethodSource(String phoneNumber) {
+        contactManager.addContact("Aston", "Brown", phoneNumber);
+        Assertions.assertFalse(contactManager.getAllContacts().isEmpty());
+        Assertions.assertEquals(1,contactManager.getAllContacts().size());
+        Assertions.assertTrue(contactManager.getAllContacts().stream()
+                .anyMatch(contact -> contact.getFirstName().equals("Aston") &&
+                        contact.getLastName().equals("Brown") &&
+                        contact.getPhoneNumber().equals("0123456789")));
+    }
+
+    private static List<String> phoneNumberList() {
+        return Arrays.asList("0123456789", "0123456789", "0123456789");
+    }
+
+    @DisplayName("CSV Source Case - Phone Number should match the required Format")
+    @ParameterizedTest
+    @CsvSource({"0123456789", "0123456789", "0123456789"})
+    public void shouldTestPhoneNumberFormatUsingCSVSource(String phoneNumber) {
         contactManager.addContact("Aston", "Brown", phoneNumber);
         Assertions.assertFalse(contactManager.getAllContacts().isEmpty());
         Assertions.assertEquals(1,contactManager.getAllContacts().size());
